@@ -13,6 +13,10 @@ app.get('/notes', (clientReq, serverRes) => {
   serverRes.sendFile(path.join(__dirname, './public/notes.html'));
 });
 
+app.get('*', (clientReq, serverRes) => {
+  serverRes.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.get('/api/notes', (clientReq, serverRes) => {
   fs.readFile('./db/db.json', (err, data) => {
     if (err) {
@@ -34,8 +38,8 @@ app.post('/api/notes', (clientReq, serverRes) => {
     const notes = JSON.parse(data);
     const newNote = {
       id: notes.length + 1,
-      title: req.body.title,
-      text: req.body.text,
+      title: clientReq.body.title,
+      text: clientReq.body.text,
     };
 
     notes.push(newNote);
@@ -43,12 +47,49 @@ app.post('/api/notes', (clientReq, serverRes) => {
     fs.writeFile('./db/db.json', JSON.stringify(notes), (err) => {
       if (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Error saving note.' });
+        return serverRes.status(500).json({ error: 'Error saving note.' });
       }
-      res.json(newNote);
+      serverRes.json(newNote);
     });
   });
 });
+
+app.delete('/api/notes/:id', (clientReq, serverRes) => {
+  const noteId = clientReq.params.id;
+
+  fs.readFile(path.join(__dirname, 'db', 'db.json'), 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return serverRes.status(500).json({ error: 'Error reading notes.' });
+    }
+
+    const notes = JSON.parse(data);
+
+    // Find the note with the given ID
+    const noteIndex = notes.findIndex((note) => note.id === noteId);
+
+    if (noteIndex === -1) {
+      return serverRes.status(404).json({ error: 'Note not found.' });
+    }
+
+    // Remove the note from the array
+    notes.splice(noteIndex, 1);
+
+    fs.writeFile(path.join(__dirname, 'db', 'db.json'), JSON.stringify(notes), (err) => {
+      if (err) {
+        console.error(err);
+        return serverRes.status(500).json({ error: 'Error deleting note.' });
+      }
+
+      serverRes.sendStatus(204);
+    });
+  });
+});
+
+// Generate a unique ID for a new note (You can use any unique ID generation method here)
+function generateUniqueId() {
+  return Date.now().toString();
+}
 
 app.listen(PORT, () => {
   console.log(`App listening on http://localhost:${PORT}`);
