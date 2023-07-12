@@ -13,10 +13,6 @@ app.get('/notes', (clientReq, serverRes) => {
   serverRes.sendFile(path.join(__dirname, './public/notes.html'));
 });
 
-app.get('*', (clientReq, serverRes) => {
-  serverRes.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
 app.get('/api/notes', (clientReq, serverRes) => {
   fs.readFile('./db/db.json', (err, data) => {
     if (err) {
@@ -56,12 +52,13 @@ app.post('/api/notes', (clientReq, serverRes) => {
 
 app.delete('/api/notes/:id', (clientReq, serverRes) => {
   const noteId = clientReq.params.id;
-
+console.log(noteId);
   fs.readFile(path.join(__dirname, 'db', 'db.json'), 'utf8', (err, data) => {
     if (err) {
       console.error(err);
       return serverRes.status(500).json({ error: 'Error reading notes.' });
     }
+    console.log(noteId);
 
     const notes = JSON.parse(data);
 
