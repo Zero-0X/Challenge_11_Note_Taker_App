@@ -1,6 +1,6 @@
 # Challenge_11_Note_Taker_App
 
-Deployed Link:
+Deployed Link: https://zero-0x.github.io/Challenge_11_Note_Taker_App/
 
 Screenshots:
 ![Screenshot (467)](https://github.com/Zero-0X/Challenge_11_Note_Taker_App/assets/110013207/5fe345b9-6e02-4cda-bec6-287b0d4996ef)
